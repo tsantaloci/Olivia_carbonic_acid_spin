@@ -13,12 +13,12 @@ def ori_editor(file,amount):
             start += num
             end += num+amount
     #print(data[start:end])
-    last_Hline = ''
+    last_Hline = []
     #print(start)
     line_num = 0
     for num,i in enumerate(data[start:end]):
         if 'H' in i:
-            last_Hline = i
+            last_Hline.append(i)
             line_num = start+num
 #    print(line_num)
 #    print(last_Hline)
@@ -27,9 +27,22 @@ def ori_editor(file,amount):
 
 
 
-def incre(amount,edit):
-    edit = edit.replace('0.0',str(amount))
-    return edit
+def incre(amount,edit,reverse=False):
+    #print(edit)
+    new = []
+    if reverse==False:
+        for x in edit:
+            edit = x.replace('0.0',str(amount))
+            new.append(edit)
+    else:
+        a = edit[0].replace('0.0',str(amount))
+        b = edit[1].replace('0.0',str(-amount))
+        new.append(a)
+        new.append(b)
+
+    #    print((edit,'lol'))
+    #print(edit)
+    return new
             
 
 def input_creator(oldfile,newline,last_num,basis,charge,spin,exc):
@@ -43,11 +56,12 @@ def input_creator(oldfile,newline,last_num,basis,charge,spin,exc):
             Hydro_list.append(num)
     data[Hydro_list[-1]] = newline
     for num,i in enumerate(data):
-        if num >= last_num:
+        if num >= last_num-1:
             i
         else:
             file.write(i)
-    file.write(newline)
+    for line in newline:
+        file.write(line)
     file.write('}\n')
     file.write(' oc= 1.20456374\n')
     file.write(' co= 1.33807754\n')
@@ -72,37 +86,77 @@ def main():
    
     amountofatoms = 6
     file = '../ori/test.com'
-    basis = 'apVTZ'
+    basis = 'aug-cc-pVTZ'
     charge = 0
     spin = 0
+    
     state = '2.1,3.1,4.1,1.2,2.2,3.2,1.3,2.3,1.3,2.3,1.4,2.4' 
+    reverse = True
 
 
 
 
 
     for num in range(0,181,3):
-        increment=float(num)
-        form = "{:03d}".format(int(increment))
-        
-        last_Hline,line_num,end = ori_editor(file,amountofatoms)
-        newline = incre(increment,last_Hline)
-        print(newline)
-        if os.path.exists('../'+form+'/'):
-            os.chdir('../'+form)
-            input_creator(file,newline,line_num,basis,
-            charge,spin,state)
-        #    os.chdir('../src')
-        else:
-            print(form)
-            print(last_Hline)
-
-            os.mkdir('../'+str(form))
-            os.chdir('../'+str(form))
+        if reverse==False: 
+            increment=float(num)
+            form = "{:03d}".format(int(increment))
             print(increment)
-            input_creator(file,newline,line_num,basis,
-            charge,spin,state)
+            if increment==180 or increment==0:
+                state = '2.1,3.1,4.1,1.2,2.2,3.2,1.3,2.3,1.3,2.3,1.4,2.4' 
+            else:
+                state='2.1,3.1,4.1,5.1,6.1,1.2,2.2,3.2,4.2,5.2'
+
+        
+            last_Hline,line_num,end = ori_editor(file,amountofatoms)
+            newline = incre(increment,last_Hline,reverse=False)
+            print(newline)
+
+            if os.path.exists('../'+form+'/'):
+                os.chdir('../'+form)
+                input_creator(file,newline,line_num,basis,
+                charge,spin,state)
         #    os.chdir('../src')
+            else:
+                print(form)
+                print(last_Hline)
+
+                os.mkdir('../'+str(form))
+                os.chdir('../'+str(form))
+                print(increment)
+                input_creator(file,newline,line_num,basis,
+                charge,spin,state)
+        if reverse==True:
+            increment=float(num)
+            form = "{:03d}".format(int(increment))
+            print(increment)
+            if increment==180 or increment==0:
+                state = '2.1,3.1,4.1,1.2,2.2,3.2,1.3,2.3,1.3,2.3,1.4,2.4' 
+            else:
+                state='2.1,3.1,4.1,5.1,6.1,1.2,2.2,3.2,4.2,5.2'
+
+        
+            last_Hline,line_num,end = ori_editor(file,amountofatoms)
+            newline = incre(increment,last_Hline,reverse=True)
+            print(newline)
+
+            if os.path.exists('../r'+form+'/'):
+                os.chdir('../r'+form)
+                input_creator(file,newline,line_num,basis,
+                charge,spin,state)
+        #    os.chdir('../src')
+            else:
+                print(form)
+                print(last_Hline)
+
+                os.mkdir('../r'+str(form))
+                os.chdir('../r'+str(form))
+                print(increment)
+                input_creator(file,newline,line_num,basis,
+                charge,spin,state)
+
+        #    os.chdir('../src')
+        
 
         
 
